@@ -7,17 +7,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create({
-    name,
-    email,
-    password,
-  }: CreateUserDto): Promise<Partial<CreateUserDto>> {
+  async create(data: CreateUserDto) {
     const user = await this.prisma.user.create({
-      data: {
-        name,
-        email,
-        password,
-      },
+      data,
       select: {
         id: true,
         name: true,
@@ -28,7 +20,7 @@ export class UserRepository {
     return user;
   }
 
-  async findAll(): Promise<Partial<CreateUserDto>[]> {
+  async findAll() {
     const users = await this.prisma.user.findMany({
       select: {
         id: true,
@@ -41,10 +33,11 @@ export class UserRepository {
         deletedAt: null,
       },
     });
+
     return users;
   }
 
-  async findAllTrashed(): Promise<Partial<CreateUserDto>[]> {
+  async findAllTrashed() {
     const users = await this.prisma.user.findMany({
       select: {
         id: true,
@@ -60,10 +53,11 @@ export class UserRepository {
         },
       },
     });
+
     return users;
   }
 
-  async findById(id: number): Promise<Partial<CreateUserDto> | null> {
+  async findById(id: number) {
     const user = await this.prisma.user.findUnique({
       where: {
         id,
@@ -77,31 +71,27 @@ export class UserRepository {
         deletedAt: true,
       },
     });
+
     return user;
   }
 
-  async update(
-    id: number,
-    { name, email }: UpdateUserDto,
-  ): Promise<UpdateUserDto | null> {
+  async update(id: number, data: UpdateUserDto) {
     const user = await this.prisma.user.update({
       where: {
         id,
       },
-      data: {
-        name,
-        email,
-      },
+      data,
       select: {
         id: true,
         name: true,
         email: true,
       },
     });
+
     return user;
   }
 
-  async findByEmail(email: string, id?: number): Promise<CreateUserDto> {
+  async findByEmail(email: string, id?: number) {
     if (id) {
       const user = await this.prisma.user.findFirst({
         where: {

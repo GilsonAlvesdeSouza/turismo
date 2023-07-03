@@ -47,20 +47,25 @@ model Customer {
 }
 
 model TravelPackage {
-  id          Int       @id @default(autoincrement())
-  name        String    @db.VarChar(100)
-  description String
-  start_date  DateTime
-  end_date    DateTime
-  price       Int
-  status      Boolean   @default(true)
-  included    String[]  @default([]) @db.VarChar(256)
-  images      String[]  @default([]) @db.VarChar(256)
-  id_user     Int
-  User        User      @relation(fields: [id_user], references: [id])
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
+  id               Int       @id @default(autoincrement())
+  name             String    @db.VarChar(100)
+  description      String
+  startDate        DateTime  @map("start_date")
+  endDate          DateTime  @map("end_date")
+  price            Int
+  status           Boolean   @default(true)
+  numberOfPeople   Int       @map("number_of_people")
+  numberOfDays     Int       @map("number_of_days")
+  numberOfNights   Int       @map("number_of_nights")
+  destinationCity  String    @map("destination_city") @db.VarChar(100)
+  destinationState String    @map("destination_state") @db.VarChar(2)
+  includedItems    String[]  @default([]) @map("included_items") @db.VarChar(256)
+  images           String[] @default([]) @db.VarChar(256)
+  idUser           Int       @map("id_user")
+  User             User      @relation(fields: [idUser], references: [id])
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
 
   @@map("travel_packages")
 }

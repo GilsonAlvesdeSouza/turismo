@@ -1,21 +1,21 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
-  Req,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
   UseGuards,
   UseInterceptors,
-  Put,
-  Query,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+import { ValidationExceptionInterceptor } from '../../interceptors/validationExceptionInterceptor';
 import { CustomerService } from './customer.service';
 import { CustomerDto } from './dto/customer.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { ValidationExceptionInterceptor } from '../../interceptors/validationExceptionInterceptor';
-import { Request } from 'express';
 
 @Controller('customers')
 @UseGuards(AuthGuard('jwt'))
@@ -69,7 +69,7 @@ export class CustomerController {
     return await this.customerService.findOneCustomer(+id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @UseInterceptors(ValidationExceptionInterceptor)
   async update(@Param('id') id: string, @Body() customerDto: CustomerDto) {
     return await this.customerService.updateCustomer(+id, customerDto);
