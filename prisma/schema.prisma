@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int             @id @default(autoincrement())
+  email         String          @unique @db.VarChar(120)
+  name          String          @db.VarChar(100)
+  password      String          @db.VarChar(60)
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  deletedAt     DateTime?       @map("deleted_at")
+  Customers     Customer[]
+  TravelPackage TravelPackage[]
+
+  @@map("users")
+}
+
+model Customer {
+  id           Int       @id @default(autoincrement())
+  name         String    @db.VarChar(100)
+  email        String?   @unique @db.VarChar(120)
+  cpf          String    @unique @db.VarChar(11)
+  phone        String    @db.VarChar(14)
+  zip_code     String?   @db.VarChar(8)
+  street       String?   @db.VarChar(100)
+  neighborhood String?   @db.VarChar(100)
+  city         String?   @db.VarChar(100)
+  state        String?   @db.VarChar(2)
+  adrees_line  String?   @db.VarChar(100)
+  status       Boolean   @default(true)
+  id_user      Int
+  User         User      @relation(fields: [id_user], references: [id])
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  @@map("customers")
+}
+
+model TravelPackage {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)
+  description String
+  start_date  DateTime
+  end_date    DateTime
+  price       Int
+  status      Boolean   @default(true)
+  included    String[]  @default([]) @db.VarChar(256)
+  images      String[]  @default([]) @db.VarChar(256)
+  id_user     Int
+  User        User      @relation(fields: [id_user], references: [id])
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  @@map("travel_packages")
+}
+
+model Imagem {
+  id        Int       @id @default(autoincrement())
+  url       String    @unique @db.VarChar(256)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("images")
+}
