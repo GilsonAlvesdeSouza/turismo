@@ -34,11 +34,11 @@ export class CustomerService {
     return await this.prisma.customer.create({ data });
   }
 
-  async findAll(id_user: number) {
-    if (id_user) {
+  async findAll(idUser: number) {
+    if (idUser) {
       const customers = await this.prisma.customer.findMany({
         where: {
-          id_user,
+          idUser,
         },
       });
 
@@ -65,7 +65,7 @@ export class CustomerService {
   async update(id: number, data: UpdateCustomerDto) {
     await this.findById(id);
 
-    await this.userServices.findById(data.id_user);
+    await this.userServices.findById(data.idUser);
 
     if (data.email) {
       const emailExist = await this.findByEmail(data.email, id);

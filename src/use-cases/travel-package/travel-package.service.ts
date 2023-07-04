@@ -36,8 +36,39 @@ export class TravelPackageService {
       where: {
         status: status ?? undefined,
       },
-      skip,
-      take,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        startDate: true,
+        endDate: true,
+        price: true,
+        status: true,
+        Schedule: {
+          select: {
+            id: true,
+            paid: true,
+            Customer: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+              },
+            },
+            User: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+
+          skip,
+          take,
+        },
+      },
     });
 
     return {
@@ -50,9 +81,32 @@ export class TravelPackageService {
     };
   }
 
-  async findOne(id: number) {
+  async findById(id: number) {
     const user = await this.prisma.travelPackage.findUnique({
       where: { id },
+      include: {
+        Schedule: {
+          select: {
+            id: true,
+            paid: true,
+            Customer: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+              },
+            },
+            User: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -63,7 +117,7 @@ export class TravelPackageService {
   }
 
   async update(id: number, data: UpdateTravelPackageDto) {
-    await this.findOne(id);
+    await this.findById(id);
 
     this.stringToDate(data);
 
@@ -85,11 +139,41 @@ export class TravelPackageService {
   }
 
   async remove(id: number) {
-    await this.findOne(id);
+    await this.findById(id);
 
     return await this.prisma.travelPackage.delete({
       where: { id },
     });
+  }
+
+  async calculateEarnings(id: number) {
+    const result = await this.prisma.travelPackage.findMany({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        price: true,
+        Schedule: {
+          select: {
+            paid: true,
+          },
+        },
+      },
+    });
+
+    const [{ price, Schedule }] = result;
+
+    let earnings = 0;
+    let totalPaidPackages = 0;
+    Schedule.forEach((el) => {
+      if (el.paid) {
+        totalPaidPackages++;
+        earnings += price;
+      }
+    });
+
+    return { earnings, totalPaidPackages };
   }
 
   private stringToDate(data: UpdateTravelPackageDto) {

@@ -20,52 +20,56 @@ model User {
   deletedAt     DateTime?       @map("deleted_at")
   Customers     Customer[]
   TravelPackage TravelPackage[]
+  Schedule      Schedule[]
+  Ticket       ticket[]
 
   @@map("users")
 }
 
 model Customer {
-  id           Int       @id @default(autoincrement())
-  name         String    @db.VarChar(100)
-  email        String?   @unique @db.VarChar(120)
-  cpf          String    @unique @db.VarChar(11)
-  phone        String    @db.VarChar(14)
-  zip_code     String?   @db.VarChar(8)
-  street       String?   @db.VarChar(100)
-  neighborhood String?   @db.VarChar(100)
-  city         String?   @db.VarChar(100)
-  state        String?   @db.VarChar(2)
-  adrees_line  String?   @db.VarChar(100)
-  status       Boolean   @default(true)
-  id_user      Int
-  User         User      @relation(fields: [id_user], references: [id])
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  deletedAt    DateTime? @map("deleted_at")
+  id           Int        @id @default(autoincrement())
+  name         String     @db.VarChar(100)
+  email        String?    @unique @db.VarChar(120)
+  cpf          String     @unique @db.VarChar(11)
+  phone        String     @db.VarChar(14)
+  zip_code     String?    @db.VarChar(8)
+  street       String?    @db.VarChar(100)
+  neighborhood String?    @db.VarChar(100)
+  city         String?    @db.VarChar(100)
+  state        String?    @db.VarChar(2)
+  adrees_line  String?    @db.VarChar(100)
+  status       Boolean    @default(true)
+  idUser       Int        @map("id_user")
+  User         User       @relation(fields: [idUser], references: [id])
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  deletedAt    DateTime?  @map("deleted_at")
+  Schedules    Schedule[]
 
   @@map("customers")
 }
 
 model TravelPackage {
-  id               Int       @id @default(autoincrement())
-  name             String    @db.VarChar(100)
+  id               Int        @id @default(autoincrement())
+  name             String     @db.VarChar(100)
   description      String
-  startDate        DateTime  @map("start_date")
-  endDate          DateTime  @map("end_date")
+  startDate        DateTime   @map("start_date")
+  endDate          DateTime   @map("end_date")
   price            Int
-  status           Boolean   @default(true)
-  numberOfPeople   Int       @map("number_of_people")
-  numberOfDays     Int       @map("number_of_days")
-  numberOfNights   Int       @map("number_of_nights")
-  destinationCity  String    @map("destination_city") @db.VarChar(100)
-  destinationState String    @map("destination_state") @db.VarChar(2)
-  includedItems    String[]  @default([]) @map("included_items") @db.VarChar(256)
-  images           String[] @default([]) @db.VarChar(256)
-  idUser           Int       @map("id_user")
-  User             User      @relation(fields: [idUser], references: [id])
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-  deletedAt        DateTime? @map("deleted_at")
+  status           Boolean    @default(true)
+  numberOfPeople   Int        @map("number_of_people")
+  numberOfDays     Int        @map("number_of_days")
+  numberOfNights   Int        @map("number_of_nights")
+  destinationCity  String     @map("destination_city") @db.VarChar(100)
+  destinationState String     @map("destination_state") @db.VarChar(2)
+  includedItems    String[]   @default([]) @map("included_items") @db.VarChar(256)
+  images           String[]   @default([]) @db.VarChar(256)
+  idUser           Int        @map("id_user")
+  User             User       @relation(fields: [idUser], references: [id])
+  createdAt        DateTime   @default(now()) @map("created_at")
+  updatedAt        DateTime   @updatedAt @map("updated_at")
+  deletedAt        DateTime?  @map("deleted_at")
+  Schedule         Schedule[]
 
   @@map("travel_packages")
 }
@@ -78,4 +82,49 @@ model Imagem {
   deletedAt DateTime? @map("deleted_at")
 
   @@map("images")
+}
+
+model Schedule {
+  id                  Int           @id @default(autoincrement())
+  paid                Boolean       @default(false)
+  price               Int
+  installments        Int           @default(0)
+  typeOfPayment       TypeOfPayment @map("type_of_payment")
+  valueOfInstallments Int           @map("value_of_installments")
+  idCustomer          Int           @map("id_customer")
+  Customer            Customer      @relation(fields: [idCustomer], references: [id])
+  idUser              Int           @map("id_user")
+  User                User          @relation(fields: [idUser], references: [id])
+  idPackage           Int           @map("id_package")
+  Package             TravelPackage @relation(fields: [idPackage], references: [id])
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+  deletedAt           DateTime?     @map("deleted_at")
+  Ticket             ticket[]
+
+  @@map("schedules")
+}
+
+model ticket {
+  id         Int       @id @default(autoincrement())
+  paid       Boolean   @default(false)
+  value      Int
+  dueDate    DateTime  @map("due_date")
+  userId     Int
+  User       User      @relation(fields: [userId], references: [id])
+  idSchedule Int       @map("id_schedule")
+  Schedule   Schedule  @relation(fields: [idSchedule], references: [id])
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  @@map("tickets")
+}
+
+enum TypeOfPayment {
+  CREDIT_CARD
+  DEBIT_CARD
+  CASH
+  PIX
+  TICKET
 }

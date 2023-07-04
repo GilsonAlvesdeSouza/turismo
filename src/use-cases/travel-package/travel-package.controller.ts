@@ -8,10 +8,12 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 import { ValidationExceptionInterceptor } from 'src/interceptors/validationExceptionInterceptor';
 import { ParseBoolOptionalPipe } from 'src/pipes/parseBoolOptionalPipe';
 import { ParseIntOptionalPipe } from 'src/pipes/parseIntOptionalPipe';
@@ -26,8 +28,11 @@ export class TravelPackageController {
 
   @UseInterceptors(ValidationExceptionInterceptor)
   @Post()
-  create(@Body() createTravelPackageDto: CreateTravelPackageDto) {
-    return this.travelPackageService.create(createTravelPackageDto);
+  create(@Body() data: CreateTravelPackageDto, @Req() req: Request) {
+    const idUser = req.user['id'] as number;
+    data.idUser = idUser;
+
+    return this.travelPackageService.create(data);
   }
 
   @Get()
@@ -51,16 +56,25 @@ export class TravelPackageController {
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id) {
-    return this.travelPackageService.findOne(id);
+    return this.travelPackageService.findById(id);
   }
 
   @UseInterceptors(ValidationExceptionInterceptor)
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id,
-    @Body() updateTravelPackageDto: UpdateTravelPackageDto,
+    @Body() data: UpdateTravelPackageDto,
+    @Req() req: Request,
   ) {
-    return this.travelPackageService.update(id, updateTravelPackageDto);
+    const idUser = req.user['id'] as number;
+    data.idUser = idUser;
+
+    return this.travelPackageService.update(id, data);
+  }
+
+  @Get(':id/calculate-earnings')
+  async calculateEarnings(@Param('id', ParseIntPipe) id) {
+    return await this.travelPackageService.calculateEarnings(id);
   }
 
   @Delete(':id')

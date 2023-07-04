@@ -23,7 +23,7 @@ import { VerifyLoginMiddleware } from '../../middlewares/verifyLogin.middleware'
     PrismaModule,
     JwtModule.register({
       privateKey: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '3600s' },
+      signOptions: { expiresIn: '50400s' },
     }),
   ],
   controllers: [AuthController],

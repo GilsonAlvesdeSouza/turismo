@@ -18,6 +18,7 @@ import { ValidationExceptionInterceptor } from '../../interceptors/validationExc
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { ParseIntOptionalPipe } from 'src/pipes/parseIntOptionalPipe';
 
 @Controller('customer')
 @UseGuards(AuthGuard('jwt'))
@@ -31,15 +32,14 @@ export class CustomerController {
     data: CreateCustomerDto,
     @Req() req: Request,
   ) {
-    const id_user = req.user['id'] as number;
-
-    data.id_user = id_user;
+    const idUser = req.user['id'] as number;
+    data.idUser = idUser;
 
     return await this.customerService.create(data);
   }
 
   @Get()
-  async findAll(@Query('id_user', ParseIntPipe) id_user) {
+  async findAll(@Query('id_user', ParseIntOptionalPipe) id_user) {
     return await this.customerService.findAll(id_user);
   }
 
@@ -55,9 +55,8 @@ export class CustomerController {
     @Body() data: UpdateCustomerDto,
     @Req() req: Request,
   ) {
-    const id_user = req.user['id'] as number;
-
-    data.id_user = id_user;
+    const idUser = req.user['id'] as number;
+    data.idUser = idUser;
 
     return await this.customerService.update(id, data);
   }

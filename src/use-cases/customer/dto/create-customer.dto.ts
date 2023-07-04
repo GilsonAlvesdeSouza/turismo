@@ -56,5 +56,5 @@ export class CreateCustomerDto {
 
   @IsNumber()
   @IsOptional()
-  id_user: number;
+  idUser: number;
 }
