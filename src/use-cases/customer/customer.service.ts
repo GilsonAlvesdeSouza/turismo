@@ -3,72 +3,57 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { PrismaService } from 'src/database/prisma.service';
 import { capitalizeWords } from '../../utils/capitalizeWords';
-import { CustomerRepository } from './customer.repository';
-import { CustomerDto } from './dto/customer.dto';
 import { UserService } from '../user/user.service';
+import { CreateCustomerDto } from './dto/create-customer.dto';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomerService {
   constructor(
-    private readonly customerRepository: CustomerRepository,
+    private readonly prisma: PrismaService,
     private readonly userServices: UserService,
   ) {}
 
-  async createCustomer({
-    name,
-    email,
-    cpf,
-    phone,
-    zip_code,
-    street,
-    neighborhood,
-    city,
-    state,
-    adrees_line,
-    status,
-    id_user,
-  }: CustomerDto) {
-    const emailExist = await this.customerRepository.findByEmail(email);
+  async create(data: CreateCustomerDto) {
+    const emailExist = await this.findByEmail(data.email);
 
     if (emailExist) {
       throw new ConflictException('Email already exists');
     }
 
-    const cpfCnpjExist = await this.customerRepository.findByCpf(cpf);
+    const cpfCnpjExist = await this.findByCpf(data.cpf);
 
     if (cpfCnpjExist) {
       throw new ConflictException('CPF/CNPJ already exists');
     }
 
-    const capitalizedName = capitalizeWords(name);
+    data.name = capitalizeWords(data.name);
 
-    const customer = await this.customerRepository.create({
-      name: capitalizedName,
-      email,
-      cpf,
-      phone,
-      zip_code,
-      street,
-      neighborhood,
-      city,
-      state,
-      adrees_line,
-      status,
-      id_user,
-    });
-
-    return customer;
+    return await this.prisma.customer.create({ data });
   }
 
-  async findAllCustomers(id_user: number) {
-    const customers = await this.customerRepository.findAll(id_user);
+  async findAll(id_user: number) {
+    if (id_user) {
+      const customers = await this.prisma.customer.findMany({
+        where: {
+          id_user,
+        },
+      });
+
+      return customers;
+    }
+
+    const customers = await this.prisma.customer.findMany({});
 
     return customers;
   }
 
-  async findOneCustomer(id: number) {
-    const customer = await this.customerRepository.findOne(id);
+  async findById(id: number) {
+    const customer = await this.prisma.customer.findUnique({
+      where: { id },
+    });
 
     if (!customer) {
       throw new NotFoundException('Customer not found');
@@ -77,60 +62,77 @@ export class CustomerService {
     return customer;
   }
 
-  async updateCustomer(
-    id: number,
-    {
-      name,
-      email,
-      cpf,
-      phone,
-      zip_code,
-      street,
-      neighborhood,
-      city,
-      state,
-      adrees_line,
-      status,
-      id_user,
-    }: CustomerDto,
-  ) {
-    await this.findOneCustomer(id);
+  async update(id: number, data: UpdateCustomerDto) {
+    await this.findById(id);
 
-    await this.userServices.findById(id_user);
+    await this.userServices.findById(data.id_user);
 
-    const emailExist = await this.customerRepository.findByEmail(email, id);
+    if (data.email) {
+      const emailExist = await this.findByEmail(data.email, id);
 
-    if (emailExist) {
-      throw new ConflictException('Email already exists');
+      if (emailExist) {
+        throw new ConflictException('Email already exists');
+      }
     }
 
-    const cpfCnpjExist = await this.customerRepository.findByCpf(cpf, id);
+    if (data.cpf) {
+      const cpfExist = await this.findByCpf(data.cpf, id);
 
-    if (cpfCnpjExist) {
-      throw new ConflictException('CPF/CNPJ already exists');
+      if (cpfExist) {
+        throw new ConflictException('CPF already exists');
+      }
     }
 
-    const customerUpdated = await this.customerRepository.update(id, {
-      name,
-      email,
-      cpf,
-      phone,
-      zip_code,
-      street,
-      neighborhood,
-      city,
-      state,
-      adrees_line,
-      status,
-      id_user,
+    data.name = capitalizeWords(data.name);
+
+    return await this.prisma.customer.update({
+      where: { id },
+      data,
     });
-
-    return customerUpdated;
   }
 
-  async removeCustomer(id: number) {
-    await this.findOneCustomer(id);
+  async remove(id: number) {
+    await this.findById(id);
+    await this.prisma.customer.delete({
+      where: { id },
+    });
+  }
 
-    await this.customerRepository.remove(id);
+  async findByEmail(email: string, id?: number) {
+    if (id) {
+      return await this.prisma.customer.findFirst({
+        where: {
+          email,
+          NOT: {
+            id,
+          },
+        },
+      });
+    }
+
+    return await this.prisma.customer.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
+  async findByCpf(cpf: string, id?: number): Promise<CreateCustomerDto> {
+    if (id) {
+      return await this.prisma.customer.findFirst({
+        where: {
+          cpf,
+          NOT: {
+            id,
+          },
+        },
+      });
+    }
+
+    return await this.prisma.customer.findUnique({
+      where: {
+        cpf,
+      },
+    });
   }
 }

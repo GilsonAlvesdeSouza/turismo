@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -49,21 +50,21 @@ export class TravelPackageController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.travelPackageService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id) {
+    return this.travelPackageService.findOne(id);
   }
 
   @UseInterceptors(ValidationExceptionInterceptor)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id,
     @Body() updateTravelPackageDto: UpdateTravelPackageDto,
   ) {
-    return this.travelPackageService.update(+id, updateTravelPackageDto);
+    return this.travelPackageService.update(id, updateTravelPackageDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.travelPackageService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id) {
+    return this.travelPackageService.remove(id);
   }
 }
