@@ -88,9 +88,11 @@ export class UserService {
   async updateUser(id: number, data: UpdateUserDto) {
     await this.findById(id);
 
-    const emailInUse = await this.findByEmail(data.email, id);
+    if (data.email) {
+      const emailInUse = await this.findByEmail(data.email, id);
 
-    if (emailInUse) throw new ConflictException('Email already exists');
+      if (emailInUse) throw new ConflictException('Email already exists');
+    }
 
     data.name = capitalizeWords(data.name);
 
