@@ -96,7 +96,7 @@ export class CustomerService {
   ) {
     await this.findOneCustomer(id);
 
-    await this.userServices.findOneUser(id_user);
+    await this.userServices.findById(id_user);
 
     const emailExist = await this.customerRepository.findByEmail(email, id);
 

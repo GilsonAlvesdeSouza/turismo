@@ -8,88 +8,170 @@ import { hashSync } from 'bcrypt';
 import { capitalizeWords } from '../../utils/capitalizeWords';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserRepository } from './user.repository';
+import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
-  async createUser({ name, email, password }: CreateUserDto) {
-    const emailInUse = await this.userRepository.findByEmail(email);
+  constructor(private readonly prisma: PrismaService) {}
+  async createUser(data: CreateUserDto) {
+    const emailInUse = await this.findByEmail(data.email);
 
     if (emailInUse) {
       throw new ConflictException('Email already exists');
     }
 
-    const encryptedPassword = hashSync(String(password), 10);
+    data.password = hashSync(String(data.password), 10);
 
-    const capitalizedNome = capitalizeWords(name);
+    data.name = capitalizeWords(data.name);
 
-    const user = await this.userRepository.create({
-      name: capitalizedNome,
-      email,
-      password: encryptedPassword,
+    return await this.prisma.user.create({
+      data,
     });
-
-    return user;
   }
 
-  findAllUsers() {
-    const users = this.userRepository.findAll();
-    return users;
+  async findAll() {
+    return await this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      where: {
+        deletedAt: null,
+      },
+    });
   }
 
-  findAllTrashedUsers() {
-    const users = this.userRepository.findAllTrashed();
-    return users;
+  async findAllTrashedUsers() {
+    return await this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+      },
+      where: {
+        deletedAt: {
+          not: null,
+        },
+      },
+    });
   }
 
-  async findOneUser(id: number) {
+  async findById(id: number) {
     if (isNaN(id) || id < 1) {
       throw new BadRequestException('Invalid id');
     }
-    const user = await this.userRepository.findById(id);
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+      },
+    });
+
     if (!user) throw new NotFoundException('User not found');
+
     return user;
   }
 
-  async updateUser(id: number, { name, email }: UpdateUserDto) {
-    await this.findOneUser(id);
+  async updateUser(id: number, data: UpdateUserDto) {
+    await this.findById(id);
 
-    const emailInUse = await this.userRepository.findByEmail(email, id);
+    const emailInUse = await this.findByEmail(data.email, id);
 
     if (emailInUse) throw new ConflictException('Email already exists');
 
-    const capitalizedNome = capitalizeWords(name);
+    data.name = capitalizeWords(data.name);
 
-    const user = await this.userRepository.update(id, {
-      name: capitalizedNome,
-      email,
+    return await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
     });
-
-    return user;
   }
 
-  async softDeleteUser(id: number) {
-    await this.findOneUser(id);
+  async softDelete(id: number) {
+    await this.findById(id);
 
-    const user = await this.userRepository.softDelete(id);
-
-    return user;
+    return await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
   }
 
-  async hardDeleteUser(id: number) {
-    await this.findOneUser(id);
+  async hardDelete(id: number) {
+    await this.findById(id);
 
-    const user = await this.userRepository.hardDelete(id);
-
-    return user;
+    return await this.prisma.user.delete({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
   }
 
   async restoreUser(id: number) {
-    await this.findOneUser(id);
+    return await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+  }
 
-    const user = await this.userRepository.restore(id);
+  async findByEmail(email: string, id?: number) {
+    if (id) {
+      return await this.prisma.user.findFirst({
+        where: {
+          email,
+          NOT: {
+            id,
+          },
+        },
+      });
+    }
 
-    return user;
+    return await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
   }
 }

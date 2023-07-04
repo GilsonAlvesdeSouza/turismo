@@ -14,7 +14,7 @@ export class ParseIntOptionalPipe
     metadata: ArgumentMetadata,
   ): number | undefined {
     if (!value) {
-      return undefined; // Retorna undefined se o valor for vazio ou não fornecido
+      return undefined;
     }
 
     const parsedValue = parseInt(value, 10);

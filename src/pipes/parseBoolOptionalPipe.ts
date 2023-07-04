@@ -14,7 +14,7 @@ export class ParseBoolOptionalPipe
     metadata: ArgumentMetadata,
   ): boolean | undefined {
     if (!value) {
-      return undefined; // Retorna undefined se o valor for vazio ou não fornecido
+      return undefined;
     }
 
     if (value.toLowerCase() === 'true') {

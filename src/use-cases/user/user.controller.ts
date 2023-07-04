@@ -31,7 +31,7 @@ export class UserController {
   @Get()
   @UseGuards(AuthGuard('jwt'))
   async findAll() {
-    return this.userService.findAllUsers();
+    return this.userService.findAll();
   }
 
   @Get('trashed')
@@ -44,13 +44,13 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   async detailLoggedUser(@Req() req: Request) {
     const id = req.user['id'];
-    return this.userService.findOneUser(+id);
+    return this.userService.findById(+id);
   }
 
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   async findOne(@Param('id', ParseIntPipe) id: string) {
-    return this.userService.findOneUser(+id);
+    return this.userService.findById(+id);
   }
 
   @UseInterceptors(ValidationExceptionInterceptor)
@@ -71,12 +71,12 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id/soft-delete')
   async softDelete(@Param('id', ParseIntPipe) id: string) {
-    return this.userService.softDeleteUser(+id);
+    return this.userService.softDelete(+id);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: string) {
-    return this.userService.hardDeleteUser(+id);
+    return this.userService.hardDelete(+id);
   }
 }

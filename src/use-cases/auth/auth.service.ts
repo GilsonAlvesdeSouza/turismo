@@ -1,20 +1,20 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserRepository } from '../user/user.repository';
-import { CreateUserDto } from '../user/dto/create-user.dto';
-import { compareSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { compareSync } from 'bcrypt';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
   async validateUser(email: string, password: string) {
     let user: CreateUserDto;
     try {
-      user = await this.userRepository.findByEmail(email);
+      user = await this.userService.findByEmail(email);
     } catch (e) {
       return null;
     }
@@ -33,7 +33,7 @@ export class AuthService {
   async login(user: CreateUserDto) {
     const payload = { sub: user.id };
 
-    const loggedUser = (await this.userRepository.findById(
+    const loggedUser = (await this.userService.findById(
       +user.id,
     )) as IUserResponse;
 
