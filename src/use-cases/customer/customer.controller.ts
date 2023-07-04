@@ -18,7 +18,7 @@ import { ValidationExceptionInterceptor } from '../../interceptors/validationExc
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { ParseIntOptionalPipe } from 'src/pipes/parseIntOptional.pipe';
+import { ParseIntOptionalPipe } from '../../pipes/parseIntOptional.pipe';
 
 @Controller('customer')
 @UseGuards(AuthGuard('jwt'))

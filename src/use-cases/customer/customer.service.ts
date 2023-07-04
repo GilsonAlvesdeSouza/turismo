@@ -3,11 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from '../../database/prisma.service';
 import { UserService } from '../user/user.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { CapitalizeWordsFields } from 'src/decorators/capitalizeWords.decorator';
+import { CapitalizeWordsFields } from '../../decorators/capitalizeWords.decorator';
 
 @Injectable()
 export class CustomerService {

@@ -14,9 +14,9 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { ValidationExceptionInterceptor } from 'src/interceptors/validationException.interceptor';
-import { ParseBoolOptionalPipe } from 'src/pipes/parseBoolOptional.pipe';
-import { ParseIntOptionalPipe } from 'src/pipes/parseIntOptional.pipe';
+import { ValidationExceptionInterceptor } from '../../interceptors/validationException.interceptor';
+import { ParseBoolOptionalPipe } from '../../pipes/parseBoolOptional.pipe';
+import { ParseIntOptionalPipe } from '../../pipes/parseIntOptional.pipe';
 import { CreateTravelPackageDto } from './dto/create-travel-package.dto';
 import { UpdateTravelPackageDto } from './dto/update-travel-package.dto';
 import { TravelPackageService } from './travel-package.service';

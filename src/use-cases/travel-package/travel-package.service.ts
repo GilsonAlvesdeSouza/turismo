@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
-import { calcPageServices } from 'src/utils/calcPageServices';
+import { PrismaService } from '../../database/prisma.service';
+import { calcPageServices } from '../../utils/calcPageServices';
 import { CreateTravelPackageDto } from './dto/create-travel-package.dto';
 import { UpdateTravelPackageDto } from './dto/update-travel-package.dto';
-import { CapitalizeWordsFields } from 'src/decorators/capitalizeWords.decorator';
-import { StringToDate } from 'src/decorators/stringToDate.decorator';
+import { CapitalizeWordsFields } from '../../decorators/capitalizeWords.decorator';
+import { StringToDate } from '../../decorators/stringToDate.decorator';
 
 @Injectable()
 export class TravelPackageService {

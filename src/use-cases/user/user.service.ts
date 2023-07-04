@@ -7,8 +7,8 @@ import {
 import { hashSync } from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from 'src/database/prisma.service';
-import { CapitalizeWordsFields } from 'src/decorators/capitalizeWords.decorator';
+import { PrismaService } from '../../database/prisma.service';
+import { CapitalizeWordsFields } from '../../decorators/capitalizeWords.decorator';
 
 @Injectable()
 export class UserService {

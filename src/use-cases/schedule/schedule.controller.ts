@@ -15,7 +15,7 @@ import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ValidationExceptionInterceptor } from 'src/interceptors/validationException.interceptor';
+import { ValidationExceptionInterceptor } from '../../interceptors/validationException.interceptor';
 import { Request } from 'express';
 
 @UseGuards(AuthGuard('jwt'))
