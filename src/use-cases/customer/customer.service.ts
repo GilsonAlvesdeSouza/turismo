@@ -4,10 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
-import { capitalizeWords } from '../../utils/capitalizeWords';
 import { UserService } from '../user/user.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { CapitalizeWordsFields } from 'src/decorators/capitalizeWords.decorator';
 
 @Injectable()
 export class CustomerService {
@@ -16,6 +16,7 @@ export class CustomerService {
     private readonly userServices: UserService,
   ) {}
 
+  @CapitalizeWordsFields(['name'])
   async create(data: CreateCustomerDto) {
     const emailExist = await this.findByEmail(data.email);
 
@@ -28,8 +29,6 @@ export class CustomerService {
     if (cpfCnpjExist) {
       throw new ConflictException('CPF/CNPJ already exists');
     }
-
-    data.name = capitalizeWords(data.name);
 
     return await this.prisma.customer.create({ data });
   }
@@ -62,6 +61,7 @@ export class CustomerService {
     return customer;
   }
 
+  @CapitalizeWordsFields(['name'])
   async update(id: number, data: UpdateCustomerDto) {
     await this.findById(id);
 
@@ -82,8 +82,6 @@ export class CustomerService {
         throw new ConflictException('CPF already exists');
       }
     }
-
-    data.name = capitalizeWords(data.name);
 
     return await this.prisma.customer.update({
       where: { id },

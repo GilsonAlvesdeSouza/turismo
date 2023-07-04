@@ -5,14 +5,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { hashSync } from 'bcrypt';
-import { capitalizeWords } from '../../utils/capitalizeWords';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/database/prisma.service';
+import { CapitalizeWordsFields } from 'src/decorators/capitalizeWords.decorator';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
+
+  @CapitalizeWordsFields(['name'])
   async createUser(data: CreateUserDto) {
     const emailInUse = await this.findByEmail(data.email);
 
@@ -21,8 +23,6 @@ export class UserService {
     }
 
     data.password = hashSync(String(data.password), 10);
-
-    data.name = capitalizeWords(data.name);
 
     return await this.prisma.user.create({
       data,
@@ -85,6 +85,7 @@ export class UserService {
     return user;
   }
 
+  @CapitalizeWordsFields(['name'])
   async updateUser(id: number, data: UpdateUserDto) {
     await this.findById(id);
 
@@ -93,8 +94,6 @@ export class UserService {
 
       if (emailInUse) throw new ConflictException('Email already exists');
     }
-
-    data.name = capitalizeWords(data.name);
 
     return await this.prisma.user.update({
       where: {

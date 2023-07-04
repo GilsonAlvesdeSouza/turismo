@@ -10,7 +10,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthService } from './auth.service';
-import { ValidationExceptionInterceptor } from '../../interceptors/validationExceptionInterceptor';
+import { ValidationExceptionInterceptor } from '../../interceptors/validationException.interceptor';
 
 @Controller('auth')
 export class AuthController {

@@ -1,19 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { calcPageServices } from 'src/utils/calcPageServices';
-import { capitalizeWords } from 'src/utils/capitalizeWords';
 import { CreateTravelPackageDto } from './dto/create-travel-package.dto';
 import { UpdateTravelPackageDto } from './dto/update-travel-package.dto';
+import { CapitalizeWordsFields } from 'src/decorators/capitalizeWords.decorator';
+import { StringToDate } from 'src/decorators/stringToDate.decorator';
 
 @Injectable()
 export class TravelPackageService {
   constructor(private readonly prisma: PrismaService) {}
-  async create(data: CreateTravelPackageDto) {
-    data.name = capitalizeWords(data.name);
-    data.destinationCity = capitalizeWords(data.destinationCity);
-    data.destinationState = capitalizeWords(data.destinationState);
-    this.stringToDate(data);
 
+  @CapitalizeWordsFields(['name', 'destinationCity', 'destinationState'])
+  @StringToDate(['startDate', 'endDate'])
+  async create(data: CreateTravelPackageDto) {
     return await this.prisma.travelPackage.create({
       data,
     });
@@ -64,7 +63,6 @@ export class TravelPackageService {
               },
             },
           },
-
           skip,
           take,
         },
@@ -116,10 +114,9 @@ export class TravelPackageService {
     return user;
   }
 
+  @StringToDate(['startDate', 'endDate'])
   async update(id: number, data: UpdateTravelPackageDto) {
     await this.findById(id);
-
-    this.stringToDate(data);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { includedItems, images, ...dataUpdate } = data;
@@ -176,8 +173,8 @@ export class TravelPackageService {
     return { earnings, totalPaidPackages };
   }
 
-  private stringToDate(data: UpdateTravelPackageDto) {
-    data.startDate = new Date(data.startDate);
-    data.endDate = new Date(data.endDate);
-  }
+  // private stringToDate(data: UpdateTravelPackageDto) {
+  //   data.startDate = new Date(data.startDate);
+  //   data.endDate = new Date(data.endDate);
+  // }
 }

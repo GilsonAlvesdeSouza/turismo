@@ -14,11 +14,11 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { ValidationExceptionInterceptor } from '../../interceptors/validationExceptionInterceptor';
+import { ValidationExceptionInterceptor } from '../../interceptors/validationException.interceptor';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { ParseIntOptionalPipe } from 'src/pipes/parseIntOptionalPipe';
+import { ParseIntOptionalPipe } from 'src/pipes/parseIntOptional.pipe';
 
 @Controller('customer')
 @UseGuards(AuthGuard('jwt'))
