@@ -1,25 +1,28 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
   ParseIntPipe,
+  Patch,
+  Post,
+  Req,
   UseGuards,
   UseInterceptors,
-  Req,
+  UsePipes,
 } from '@nestjs/common';
-import { ScheduleService } from './schedule.service';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+import { TrimSpacesPipe } from 'src/pipes/trimSpace.pipe';
+import { ValidationExceptionInterceptor } from '../../interceptors/validationException.interceptor';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { ValidationExceptionInterceptor } from '../../interceptors/validationException.interceptor';
-import { Request } from 'express';
+import { ScheduleService } from './schedule.service';
 
-@UseGuards(AuthGuard('jwt'))
 @Controller('schedule')
+@UsePipes(new TrimSpacesPipe())
+@UseGuards(AuthGuard('jwt'))
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 

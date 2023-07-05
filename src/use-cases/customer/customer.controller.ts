@@ -11,6 +11,7 @@ import {
   Req,
   UseGuards,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -19,8 +20,10 @@ import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { ParseIntOptionalPipe } from '../../pipes/parseIntOptional.pipe';
+import { TrimSpacesPipe } from '../../pipes/trimSpace.pipe';
 
 @Controller('customer')
+@UsePipes(new TrimSpacesPipe())
 @UseGuards(AuthGuard('jwt'))
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
@@ -52,8 +55,10 @@ export class CustomerController {
   @UseInterceptors(ValidationExceptionInterceptor)
   async update(
     @Param('id', ParseIntPipe) id,
-    @Body() data: UpdateCustomerDto,
-    @Req() req: Request,
+    @Body()
+    data: UpdateCustomerDto,
+    @Req()
+    req: Request,
   ) {
     const idUser = req.user['id'] as number;
     data.idUser = idUser;

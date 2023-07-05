@@ -36,7 +36,7 @@ export class CreateScheduleDto {
 
   @Min(1)
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   valueOfInstallments: number;
 
   @Min(1)

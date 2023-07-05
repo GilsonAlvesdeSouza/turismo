@@ -19,7 +19,7 @@ export class CreateCustomerDto {
   @IsEmail(undefined)
   email: string;
 
-  @Length(11, 14)
+  @Length(11, 11)
   cpf: string;
 
   @IsNotEmpty()

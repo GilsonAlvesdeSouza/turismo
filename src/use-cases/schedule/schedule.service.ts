@@ -14,12 +14,62 @@ export class ScheduleService {
     return await this.prisma.schedule.findMany({
       select: {
         id: true,
+        paid: true,
+        typeOfPayment: true,
         Customer: {
           select: {
             id: true,
             name: true,
             email: true,
             phone: true,
+          },
+        },
+        Package: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            startDate: true,
+            endDate: true,
+            price: true,
+          },
+        },
+        User: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        createdAt: true,
+      },
+    });
+  }
+
+  async findById(id: number) {
+    const schedule = await this.prisma.schedule.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        paid: true,
+        price: true,
+        installments: true,
+        typeOfPayment: true,
+        valueOfInstallments: true,
+        Customer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            cpf: true,
+            phone: true,
+            zip_code: true,
+            street: true,
+            neighborhood: true,
+            city: true,
+            state: true,
+            adrees_line: true,
+            status: true,
           },
         },
         Package: {
@@ -47,12 +97,23 @@ export class ScheduleService {
             email: true,
           },
         },
+        Ticket: {
+          select: {
+            id: true,
+            paid: true,
+            dueDate: true,
+            value: true,
+            User: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
       },
     });
-  }
-
-  async findById(id: number) {
-    const schedule = await this.prisma.schedule.findUnique({ where: { id } });
 
     if (!schedule) {
       throw new NotFoundException('Schedule not found');

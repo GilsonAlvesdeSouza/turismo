@@ -7,7 +7,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { UserService } from '../user/user.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { CapitalizeWordsFields } from '../../decorators/capitalizeWords.decorator';
+import { Utils } from '../../utils/utils';
 
 @Injectable()
 export class CustomerService {
@@ -16,7 +16,6 @@ export class CustomerService {
     private readonly userServices: UserService,
   ) {}
 
-  @CapitalizeWordsFields(['name'])
   async create(data: CreateCustomerDto) {
     const emailExist = await this.findByEmail(data.email);
 
@@ -24,11 +23,13 @@ export class CustomerService {
       throw new ConflictException('Email already exists');
     }
 
-    const cpfCnpjExist = await this.findByCpf(data.cpf);
+    const cpfExist = await this.findByCpf(data.cpf);
 
-    if (cpfCnpjExist) {
+    if (cpfExist) {
       throw new ConflictException('CPF/CNPJ already exists');
     }
+
+    capitalizeFields(data);
 
     return await this.prisma.customer.create({ data });
   }
@@ -61,7 +62,6 @@ export class CustomerService {
     return customer;
   }
 
-  @CapitalizeWordsFields(['name'])
   async update(id: number, data: UpdateCustomerDto) {
     await this.findById(id);
 
@@ -82,6 +82,9 @@ export class CustomerService {
         throw new ConflictException('CPF already exists');
       }
     }
+
+    // data.name = Utils.capitalizeWords(data.name);
+    capitalizeFields(data);
 
     return await this.prisma.customer.update({
       where: { id },
@@ -133,4 +136,12 @@ export class CustomerService {
       },
     });
   }
+}
+
+function capitalizeFields(data: UpdateCustomerDto) {
+  data.name = Utils.capitalizeWords(data.name);
+  data.city = Utils.capitalizeWords(data.city);
+  data.street = Utils.capitalizeWords(data.street);
+  data.neighborhood = Utils.capitalizeWords(data.neighborhood);
+  data.adrees_line = Utils.capitalizeWords(data.adrees_line);
 }

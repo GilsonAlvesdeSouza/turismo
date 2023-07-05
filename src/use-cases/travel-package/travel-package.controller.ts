@@ -11,6 +11,7 @@ import {
   Req,
   UseGuards,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -20,14 +21,17 @@ import { ParseIntOptionalPipe } from '../../pipes/parseIntOptional.pipe';
 import { CreateTravelPackageDto } from './dto/create-travel-package.dto';
 import { UpdateTravelPackageDto } from './dto/update-travel-package.dto';
 import { TravelPackageService } from './travel-package.service';
+import { TrimSpacesPipe } from '../../pipes/trimSpace.pipe';
 
-@UseGuards(AuthGuard('jwt'))
 @Controller('travel-package')
+@UsePipes(new TrimSpacesPipe())
+@UseGuards(AuthGuard('jwt'))
 export class TravelPackageController {
   constructor(private readonly travelPackageService: TravelPackageService) {}
 
-  @UseInterceptors(ValidationExceptionInterceptor)
   @Post()
+  @UsePipes(new TrimSpacesPipe())
+  @UseInterceptors(ValidationExceptionInterceptor)
   create(@Body() data: CreateTravelPackageDto, @Req() req: Request) {
     const idUser = req.user['id'] as number;
     data.idUser = idUser;

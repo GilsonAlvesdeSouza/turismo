@@ -1,18 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
-import { calcPageServices } from '../../utils/calcPageServices';
 import { CreateTravelPackageDto } from './dto/create-travel-package.dto';
 import { UpdateTravelPackageDto } from './dto/update-travel-package.dto';
-import { CapitalizeWordsFields } from '../../decorators/capitalizeWords.decorator';
-import { StringToDate } from '../../decorators/stringToDate.decorator';
+import { Utils } from '../../utils/utils';
 
 @Injectable()
 export class TravelPackageService {
   constructor(private readonly prisma: PrismaService) {}
 
-  @CapitalizeWordsFields(['name', 'destinationCity', 'destinationState'])
-  @StringToDate(['startDate', 'endDate'])
   async create(data: CreateTravelPackageDto) {
+    capitalizeWords(data);
+    stringToDate(data);
+
     return await this.prisma.travelPackage.create({
       data,
     });
@@ -25,7 +24,7 @@ export class TravelPackageService {
       },
     });
 
-    const { skip, take, pageCount, pageNumberReq } = calcPageServices(
+    const { skip, take, pageCount, pageNumberReq } = Utils.calcPageServices(
       pageNumber,
       pageSize,
       countRecords,
@@ -63,10 +62,10 @@ export class TravelPackageService {
               },
             },
           },
-          skip,
-          take,
         },
       },
+      skip,
+      take,
     });
 
     return {
@@ -114,9 +113,11 @@ export class TravelPackageService {
     return user;
   }
 
-  @StringToDate(['startDate', 'endDate'])
   async update(id: number, data: UpdateTravelPackageDto) {
     await this.findById(id);
+
+    capitalizeWords(data);
+    stringToDate(data);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { includedItems, images, ...dataUpdate } = data;
@@ -172,9 +173,24 @@ export class TravelPackageService {
 
     return { earnings, totalPaidPackages };
   }
+}
 
-  // private stringToDate(data: UpdateTravelPackageDto) {
-  //   data.startDate = new Date(data.startDate);
-  //   data.endDate = new Date(data.endDate);
-  // }
+function stringToDate(data: UpdateTravelPackageDto) {
+  if (data.startDate) {
+    data.startDate = Utils.stringToDate(String(data.startDate));
+  }
+
+  if (data.endDate) {
+    data.endDate = Utils.stringToDate(String(data.endDate));
+  }
+}
+
+function capitalizeWords(data: UpdateTravelPackageDto) {
+  if (data.name) {
+    data.name = Utils.capitalizeWords(data.name);
+  }
+
+  if (data.description) {
+    data.description = Utils.capitalizeWords(data.description);
+  }
 }

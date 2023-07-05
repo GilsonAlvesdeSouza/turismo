@@ -8,13 +8,12 @@ import { hashSync } from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../database/prisma.service';
-import { CapitalizeWordsFields } from '../../decorators/capitalizeWords.decorator';
+import { Utils } from '../../utils/utils';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  @CapitalizeWordsFields(['name'])
   async createUser(data: CreateUserDto) {
     const emailInUse = await this.findByEmail(data.email);
 
@@ -23,6 +22,8 @@ export class UserService {
     }
 
     data.password = hashSync(String(data.password), 10);
+
+    data.name = Utils.capitalizeWords(data.name);
 
     return await this.prisma.user.create({
       data,
@@ -85,7 +86,6 @@ export class UserService {
     return user;
   }
 
-  @CapitalizeWordsFields(['name'])
   async updateUser(id: number, data: UpdateUserDto) {
     await this.findById(id);
 
@@ -94,6 +94,8 @@ export class UserService {
 
       if (emailInUse) throw new ConflictException('Email already exists');
     }
+
+    data.name = Utils.capitalizeWords(data.name);
 
     return await this.prisma.user.update({
       where: {

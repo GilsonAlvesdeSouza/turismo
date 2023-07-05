@@ -21,7 +21,7 @@ model User {
   Customers     Customer[]
   TravelPackage TravelPackage[]
   Schedule      Schedule[]
-  Ticket       ticket[]
+  Ticket        ticket[]
 
   @@map("users")
 }
@@ -90,7 +90,7 @@ model Schedule {
   price               Int
   installments        Int           @default(0)
   typeOfPayment       TypeOfPayment @map("type_of_payment")
-  valueOfInstallments Int           @map("value_of_installments")
+  valueOfInstallments Int?          @map("value_of_installments")
   idCustomer          Int           @map("id_customer")
   Customer            Customer      @relation(fields: [idCustomer], references: [id])
   idUser              Int           @map("id_user")
@@ -100,7 +100,7 @@ model Schedule {
   createdAt           DateTime      @default(now()) @map("created_at")
   updatedAt           DateTime      @updatedAt @map("updated_at")
   deletedAt           DateTime?     @map("deleted_at")
-  Ticket             ticket[]
+  Ticket              ticket[]
 
   @@map("schedules")
 }

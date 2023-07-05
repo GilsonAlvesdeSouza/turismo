@@ -10,6 +10,7 @@ import {
   UseGuards,
   Req,
   ParseIntPipe,
+  UsePipes,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,8 +18,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ValidationExceptionInterceptor } from '../../interceptors/validationException.interceptor';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { TrimSpacesPipe } from '../../pipes/trimSpace.pipe';
 
 @Controller('user')
+@UsePipes(new TrimSpacesPipe())
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
